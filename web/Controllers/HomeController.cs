@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hangfire;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -13,18 +14,35 @@ namespace web.Controllers
             return View();
         }
 
-        public ActionResult About()
+        public ActionResult Buffer()
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
+            return Content(TextBuffer.ToString());
         }
 
-        public ActionResult Contact()
+        [HttpPost]
+        public ActionResult CreateBackGroundJob()
         {
-            ViewBag.Message = "Your contact page.";
+            int n = GetRandom();
+            BackgroundJob.Enqueue(() => new Job().DoWork(n));
+            TextBuffer.WriteLine("Background - job successfully created to find prime number >=" + n);
 
-            return View();
+            return RedirectToAction("Index");
         }
+
+        public ActionResult CreateRecurringJob()
+        {
+            int n = GetRandom();
+            RecurringJob.AddOrUpdate(() => new Job().DoWork(n), Cron.Minutely);
+            TextBuffer.WriteLine("Recurring Job (every minute) has been created to find prime number >=" + n.ToString());
+
+            return RedirectToAction("Index");
+        }
+
+        private int GetRandom()
+        {
+            return _random.Next(10000, 100000);
+        }
+
+        private Random _random = new Random(DateTime.Now.Second);
     }
 }

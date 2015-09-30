@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hangfire.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,6 +17,12 @@ namespace web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            // Set Logging provider to get HangFire server messages
+            LogProvider.SetCurrentLogProvider(new TextBufferLogProvider());
+
+            // Print our "web console"
+            TextBuffer.WriteLine("Application started.");
         }
     }
 }
